@@ -11,12 +11,15 @@ if('serviceWorker' in navigator){
     })
 }
 
-var constraints = {video : {facingMode: "user" }, audio: false}
+var camMode = "user"
+
+var constraints = {video : {facingMode: camMode }, audio: false}
 
 const cameraView = document.querySelector('#camera--view'),
     cameraOutput = document.querySelector('#camera--output'),
     cameraSensor = document.querySelector('#camera--sensor'),
-    cameraTrigger = document.querySelector('#camera--trigger')
+    cameraTrigger = document.querySelector('#camera--trigger'),
+    cameraSwitcher = document.querySelector('#camera--inverter')
 
 function cameraStart() {
     navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
@@ -26,6 +29,20 @@ function cameraStart() {
     .catch(function (error) {
         console.error("ocorreu um Erro.", error)
     })
+}
+
+cameraSwitcher.onclick = function() {
+    stopMediatracks(cameraView.srcObject);
+    camMode = camMode === "user" ? "environment" : "user";
+    constraints = {video: {facingMode: camMode}, audio:false}
+    console.log(constraints)
+    cameraStart();
+}
+
+function stopMediatracks(stream) {
+    stream.getTracks().forEach(track => {
+        track.stop()
+    });
 }
 
 cameraTrigger.onclick = function () {
